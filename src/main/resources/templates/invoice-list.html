@@ -56,6 +56,7 @@
             border-radius: 50%;
             transition: background-color 0.25s, color 0.25s;
         }
+
         .close-button:hover {
             background-color: #007bff;
             color: #fff;
@@ -83,7 +84,8 @@
             font-size: 0.95rem;
         }
 
-        th, td {
+        th,
+        td {
             padding: 0.9rem;
             text-align: left;
             border-bottom: 1px solid #dee2e6;
@@ -131,7 +133,8 @@
                 padding: 0.4rem 1rem;
             }
 
-            th, td {
+            th,
+            td {
                 font-size: 0.85rem;
                 padding: 0.6rem;
             }
@@ -153,7 +156,6 @@
         </div>
 
         <a th:href="@{/invoices/new}" class="add-btn">+ Add New Invoice</a>
-
         <table>
             <thead>
                 <tr>
@@ -170,14 +172,16 @@
                     <td th:text="${inv.id}"></td>
                     <td th:text="${inv.customer.customerName}"></td>
                     <td th:text="${#temporals.format(inv.invoiceDate, 'dd-MM-yyyy')}"></td>
-                    <td th:text="${inv.totalAmount}"></td>
+
+                    <td th:text="${#numbers.formatCurrency(inv.totalAmount)}"></td>
+
                     <td>
-                        <a th:href="@{/invoices/pdf/{id}(id=${inv.id})}" class="pdf-link" target="_blank">Download PDF</a>
+                        <a th:href="@{/invoices/pdf/{id}(id=${inv.id})}" class="pdf-link" target="_blank">Download
+                            PDF</a>
                     </td>
                     <td>
-                        <a th:href="@{/invoices/delete/{id}(id=${inv.id})}"
-                           class="button delete-btn"
-                           onclick="return confirm('Are you sure you want to delete this invoice?');">Delete</a>
+                        <a th:href="@{/invoices/delete/{id}(id=${inv.id})}" class="button delete-btn"
+                            onclick="return confirm('Are you sure you want to delete this invoice?');">Delete</a>
                     </td>
                 </tr>
             </tbody>

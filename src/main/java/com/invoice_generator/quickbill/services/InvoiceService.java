@@ -74,6 +74,52 @@ public class InvoiceService {
         return invoiceRepository.save(invoice);
     }
 
+    public Invoice createPreviewInvoice(Long customerId, List<Long> itemIds, List<Integer> quantities) {
+        // This method simply calls the building logic but DOES NOT save the result.
+        // It returns a transient (unsaved) Invoice object.
+        return buildNewInvoice(customerId, itemIds, quantities);
+    }
+
+    private Invoice buildNewInvoice(Long customerId, List<Long> itemIds, List<Integer> quantities) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with ID: " + customerId));
+
+        Invoice invoice = new Invoice();
+        invoice.setCustomer(customer);
+        invoice.setInvoiceDate(LocalDate.now());
+
+        BigDecimal subTotal = BigDecimal.ZERO;
+
+        for (int i = 0; i < itemIds.size(); i++) {
+            Long itemId = itemIds.get(i);
+            int quantity = quantities.get(i);
+            if (quantity <= 0) continue;
+
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new EntityNotFoundException("Item not found with ID: " + itemId));
+
+            BigDecimal lineItemTotal = item.getItemUnitPrice().multiply(new BigDecimal(quantity));
+
+            InvoiceLineItem lineItem = new InvoiceLineItem();
+            lineItem.setItem(item);
+            lineItem.setQuantity(quantity);
+            lineItem.setTotalPrice(lineItemTotal);
+            
+            invoice.addLineItem(lineItem); // Helper method links it back
+
+            subTotal = subTotal.add(lineItemTotal);
+        }
+
+        BigDecimal gstAmount = subTotal.multiply(GST_RATE).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalAmount = subTotal.add(gstAmount);
+
+        invoice.setSubTotal(subTotal);
+        invoice.setGstAmount(gstAmount);
+        invoice.setTotalAmount(totalAmount);
+
+        return invoice;
+    }
+
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }

@@ -25,14 +25,14 @@ public class SignupController {
         this.userService = userService;
     }
 
-    // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/signup")
     public String signupPage(Model model) {
         model.addAttribute("user", new User());
         return "signup";
     }
 
-    // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/signup")
     public String processSignup(@ModelAttribute User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));

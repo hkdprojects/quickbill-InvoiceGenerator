@@ -87,6 +87,11 @@
             border: 1px solid #ccc;
         }
 
+        td input[type="number"]:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
         button {
             background-color: var(--success);
             color: white;
@@ -160,18 +165,14 @@
 <body>
     <div class="form-container">
         <h2>Create Invoice</h2>
-        <form th:action="@{/invoices/preview}" method="post">
+        <form id="invoiceForm" th:action="@{/invoices/preview}" method="post">
 
-            <!-- Customer Dropdown -->
             <label for="customerId">Select Customer</label>
             <select id="customerId" name="customerId" required>
                 <option value="">-- Select Customer --</option>
-                <option th:each="cust : ${customer}" th:value="${cust.customerId}" th:text="${cust.customerName}">
-                    <input type="hidden" name="customerId" th:value="${cust.customerId}" />
-                </option>
+                <option th:each="cust : ${customers}" th:value="${cust.customerId}" th:text="${cust.customerName}"></option>
             </select>
 
-            <!-- Item List Table -->
             <table>
                 <thead>
                     <tr>
@@ -184,16 +185,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="item : ${item}">
+                    <tr th:each="item, iterStat : ${items}">
                         <td class="checkbox-col" data-label="Select">
-                            <input type="checkbox" th:name="itemIds" th:value="${item.itemId}" />
+                            <input type="checkbox" th:id="'itemCheckbox-' + ${iterStat.index}" 
+                                   name="itemId" th:value="${item.itemId}"
+                                   th:data-quantity-input-id="'quantity-' + ${iterStat.index}"
+                                   onchange="toggleQuantity(this)"/>
                         </td>
                         <td data-label="Name" th:text="${item.itemName}"></td>
                         <td data-label="Description" th:text="${item.itemDescription}"></td>
                         <td data-label="Available" th:text="${item.itemQuantity}"></td>
-                        <td data-label="Unit Price" th:text="${item.itemUnitPrice}"></td>
+                        <td data-label="Unit Price" th:text="${#numbers.formatCurrency(item.itemUnitPrice)}"></td>
                         <td data-label="Quantity">
-                            <input type="number" th:name="itemQuantity" value="${item.itemQuantity}" th:value="1"/>
+                            <input type="number" th:id="'quantity-' + ${iterStat.index}"
+                                   value="1" min="1" disabled/>
                         </td>
                     </tr>
                 </tbody>
@@ -201,6 +206,21 @@
             <button type="submit">Preview Invoice</button>
         </form>
     </div>
-</body>
 
+    
+    <script>
+        function toggleQuantity(checkbox) {
+            const quantityInputId = checkbox.dataset.quantityInputId;
+            const quantityInput = document.getElementById(quantityInputId);
+
+            if (checkbox.checked) {
+                quantityInput.disabled = false;
+                quantityInput.setAttribute('name', 'itemQuantity');
+            } else {
+                quantityInput.disabled = true;
+                quantityInput.removeAttribute('name');
+            }
+        }
+    </script>
+</body>
 </html>

@@ -25,9 +25,9 @@ public class InvoiceController {
     @Autowired
     private InvoiceService invoiceService;
     @Autowired
-    private CustomerService customerService; // For fetching customers for the form
+    private CustomerService customerService; 
     @Autowired
-    private ItemService itemService;         // For fetching items for the form
+    private ItemService itemService;  
     @Autowired
     private PdfService pdfService;
 
@@ -57,13 +57,8 @@ public class InvoiceController {
                                  @RequestParam List<Integer> itemQuantity,
                                  Model model) {
 
-        // You can create a similar service method for preview if logic gets complex
-        // For now, we can build a transient (unsaved) object here for the view
-        Invoice previewInvoice = invoiceService.createAndSaveInvoice(customerId, itemId, itemQuantity);
-        
-        // Important: Detach the entity so it doesn't get persisted by accident if a transaction is open.
-        // The service method is transactional, so it will be saved. The preview should probably be a separate non-transactional service method.
-        // Let's assume you'll create a new service method for preview later.
+        // Calls the NEW service method that only builds the object and does NOT save it
+        Invoice previewInvoice = invoiceService.createPreviewInvoice(customerId, itemId, itemQuantity);
         
         model.addAttribute("invoice", previewInvoice);
         return "invoice-preview";
