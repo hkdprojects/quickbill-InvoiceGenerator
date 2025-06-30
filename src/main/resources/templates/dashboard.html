@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Quick Bill</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 10px;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: #333;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 0.5rem;
+        }
+
+        header p {
+            margin: 0.2rem 0;
+        }
+
+        .logoutButton {
+            color: #fff;
+            background: var(--danger);
+            padding: 0.4rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        section {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        section h2 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .notice {
+            max-width: 800px;
+            margin: 1rem auto;
+            text-align: center;
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            background-color: #e9ecef;
+            font-size: 0.9rem;
+        }
+
+        @media screen and (max-width: 768px) {
+            header, main, footer {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to Quick Bill</h1>
+        <p>Logged in as: <span sec:authentication="principal.firstName">[Not Logged In]</span></p>
+        <p>Role: <span sec:authentication="principal.authorities"></span></p>
+        <p><a th:href="@{/logout}" sec:authorize="isAuthenticated()" class="logoutButton">Logout</a></p>
+    </header>
+
+    <main>
+        <section sec:authorize="isAuthenticated()">
+            <h2>Common Tools</h2>
+            <p>Welcome to the Quick Bill System. Please select a task from your authorized menu.</p>
+        </section>
+
+        <!-- Admin Section -->
+        <section sec:authorize="hasRole('ROLE_ADMIN')">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a th:href="@{/items/list}">Manage Items</a></li>
+                <li><a th:href="@{/customers/list}">Manage Customers</a></li>
+                <li><a th:href="@{/invoices/list}">View Invoices</a></li>
+                <li><a th:href="@{/user/list}">User Management</a></li>
+            </ul>
+        </section>
+
+        <!-- Receptionist Section -->
+        <section sec:authorize="hasRole('ROLE_RECEPTIONIST')">
+            <h2>Receptionist Tools</h2>
+            <ul>
+                <li><a th:href="@{/invoices/new}">Generate Invoice</a></li>
+                <li><a th:href="@{/customers/add}">Create Customer</a></li>
+                <li><a th:href="@{/customers/list}">View Customers</a></li>
+                <li><a th:href="@{/items/list}">View Items</a></li>
+                <li><a th:href="@{/invoices/list}">Invoices List</a></li>
+
+            </ul>
+        </section>
+
+        <!-- Manager Section -->
+        <section sec:authorize="hasRole('ROLE_MANAGER')">
+            <h2>Manager Tools</h2>
+            <ul>
+                <li><a th:href="@{/items/list}">View Items</a></li>
+                <li><a th:href="@{/customers/list}">View Customers</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <div th:if="${param.denied}" class="notice">
+        Access Denied: You do not have permission to perform this action.
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Quick Bill. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

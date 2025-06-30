@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Invoice</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --text-dark: #333;
+            --bg-light: #f2f2f2;
+            --bg-white: #fff;
+            --border-radius: 10px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 2rem;
+            color: var(--text-dark);
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: auto;
+            background-color: var(--bg-white);
+            padding: 2rem 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .checkbox-col {
+            text-align: center;
+        }
+
+        td input[type="number"] {
+            width: 70px;
+            padding: 0.3rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead tr {
+                display: none;
+            }
+
+            tbody tr {
+                margin-bottom: 1.5rem;
+                border-bottom: 2px solid #ccc;
+                padding-bottom: 1rem;
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                text-align: right;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                text-align: left;
+                float: left;
+            }
+
+            td input[type="number"] {
+                width: 100px;
+            }
+
+            .checkbox-col {
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Create Invoice</h2>
+        <form th:action="@{/invoices/preview}" method="post">
+
+            <!-- Customer Dropdown -->
+            <label for="customerId">Select Customer</label>
+            <select id="customerId" name="customerId" required>
+                <option value="">-- Select Customer --</option>
+                <option th:each="cust : ${customer}" th:value="${cust.customerId}" th:text="${cust.customerName}">
+                    <input type="hidden" name="customerId" th:value="${cust.customerId}" />
+                </option>
+            </select>
+
+            <!-- Item List Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-col">Select</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Available</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${item}">
+                        <td class="checkbox-col" data-label="Select">
+                            <input type="checkbox" th:name="itemIds" th:value="${item.itemId}" />
+                        </td>
+                        <td data-label="Name" th:text="${item.itemName}"></td>
+                        <td data-label="Description" th:text="${item.itemDescription}"></td>
+                        <td data-label="Available" th:text="${item.itemQuantity}"></td>
+                        <td data-label="Unit Price" th:text="${item.itemUnitPrice}"></td>
+                        <td data-label="Quantity">
+                            <input type="number" th:name="itemQuantity" value="${item.itemQuantity}" th:value="1"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit">Preview Invoice</button>
+        </form>
+    </div>
+</body>
+
+</html>
